@@ -1,9 +1,10 @@
 import React from 'react';
+import { Button } from './ui/button';
 
-const Navbar = () => {
+const Navbar = ({ onReset, sessionActive }) => {
   return (
     <header className="bg-primary">
-      <div className="container mx-auto px-4 py-3 flex items-center">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white flex items-center">
           <svg 
             viewBox="0 0 256 256" 
@@ -15,6 +16,16 @@ const Navbar = () => {
           </svg>
           GStreamer Log Viewer
         </h1>
+        
+        {sessionActive && (
+          <Button 
+            variant="outline" 
+            className="bg-white hover:bg-gray-100 text-primary"
+            onClick={onReset}
+          >
+            Upload New File
+          </Button>
+        )}
       </div>
     </header>
   );
