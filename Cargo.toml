@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-gst-log-parser = { path = "../gst-log-parser" }
+# Local parser integrated
 axum = { version = "0.7.2", features = ["multipart"] }
 tokio = { version = "1.34.0", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
@@ -17,3 +17,7 @@ gstreamer = "0.21.1"
 anyhow = "1.0"
 log = "0.4"
 env_logger = "0.10"
+# Additional dependencies needed for the parser
+itertools = "0.10"
+lazy_static = "1.4"
+thiserror = "1.0"
