@@ -12,7 +12,7 @@ function App() {
   const [filterOptions, setFilterOptions] = useState(null);
   const [filters, setFilters] = useState({
     level: null,
-    category: null,
+    categories: [],
     message_regex: null,
     pid: null,
     thread: null,
@@ -125,7 +125,7 @@ function App() {
     setIsLoading(false);
     setFilters({
       level: null,
-      category: null,
+      categories: [],
       message_regex: null,
       pid: null,
       thread: null,

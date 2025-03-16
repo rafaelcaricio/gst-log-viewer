@@ -1,26 +1,57 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Search, X } from 'lucide-react';
+import { Search, X, Check, ChevronDown } from 'lucide-react';
 
 const FilterPanel = ({ isLoading, filterOptions, filters, onFilterChange }) => {
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+
   const handleFilter = (key, value) => {
     const newFilters = { ...filters, [key]: value };
     onFilterChange(newFilters);
   };
 
+  const handleCategoryToggle = (category) => {
+    let newCategories;
+
+    if (filters.categories.includes(category)) {
+      // Remove the category if it's already selected
+      newCategories = filters.categories.filter(c => c !== category);
+    } else {
+      // Add the category if it's not selected
+      newCategories = [...filters.categories, category];
+    }
+
+    handleFilter('categories', newCategories);
+  };
+
   const handleClearFilters = () => {
+    // Make sure to use an empty array for categories
     onFilterChange({
       level: null,
-      category: null,
+      categories: [],
       message_regex: null,
       pid: null,
       thread: null,
       object: null,
       function_regex: null,
     });
+  };
+
+  const isCategorySelected = (category) => {
+    return filters.categories.includes(category);
+  };
+
+  const getCategoriesDisplayText = () => {
+    if (!filters.categories || filters.categories.length === 0) {
+      return 'All categories';
+    }
+    if (filters.categories.length === 1) {
+      return filters.categories[0];
+    }
+    return `${filters.categories.length} categories selected`;
   };
 
   if (isLoading || !filterOptions) {
@@ -75,23 +106,46 @@ const FilterPanel = ({ isLoading, filterOptions, filters, onFilterChange }) => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Category</label>
-          <Select 
-            value={filters.category || 'all-categories'} 
-            onValueChange={(value) => handleFilter('category', value === 'all-categories' ? null : value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="All categories" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all-categories">All categories</SelectItem>
-              {filterOptions.categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <label className="text-sm font-medium">Categories</label>
+          <div className="relative">
+            <div 
+              className="flex items-center justify-between border rounded-md px-3 py-2 text-sm cursor-pointer hover:border-gray-400"
+              onClick={() => setCategoriesOpen(!categoriesOpen)}
+            >
+              <span>{getCategoriesDisplayText()}</span>
+              <ChevronDown className="h-4 w-4" />
+            </div>
+            
+            {categoriesOpen && (
+              <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+                {filterOptions.categories.map((category) => (
+                  <div key={category}
+                    className={`px-3 py-2 cursor-pointer flex items-center justify-between hover:bg-gray-100 ${isCategorySelected(category) ? 'bg-blue-50' : ''}`}
+                    onClick={() => handleCategoryToggle(category)}
+                  >
+                    <span>{category}</span>
+                    {isCategorySelected(category) && <Check className="h-4 w-4 text-blue-600" />}
+                  </div>
+                ))}
+                {filters.categories.length > 0 && (
+                  <div className="border-t px-3 py-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full justify-start text-gray-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFilter('categories', []);
+                        setCategoriesOpen(false);
+                      }}
+                    >
+                      Clear selection
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="space-y-2">

@@ -1,6 +1,6 @@
-mod parser;
-mod models;
 mod handlers;
+mod models;
+mod parser;
 
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
@@ -10,10 +10,10 @@ use axum::Router;
 use tempfile::tempdir;
 use tower_http::{cors::CorsLayer, services::ServeDir};
 
-use models::AppState;
-use handlers::upload::upload_log;
-use handlers::query::get_logs;
 use handlers::options::get_filter_options;
+use handlers::query::get_logs;
+use handlers::upload::upload_log;
+use models::AppState;
 
 #[tokio::main]
 async fn main() {

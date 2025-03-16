@@ -1,10 +1,10 @@
+use axum::http::StatusCode;
+use axum::response::{IntoResponse, Json};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::sync::RwLock;
 use tempfile::TempDir;
-use axum::http::StatusCode;
-use axum::response::{IntoResponse, Json};
 
 use crate::parser::Entry;
 
@@ -44,18 +44,31 @@ impl IntoResponse for ApiError {
 }
 
 // Filter parameters for log query
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub struct LogFilter {
     pub session_id: String,
     pub level: Option<String>,
-    pub category: Option<String>,
+    // Instead of trying to deserialize directly, we'll handle this field manually
+    #[serde(skip)]
+    pub categories: Vec<String>,
     pub message_regex: Option<String>,
     pub pid: Option<u32>,
     pub thread: Option<String>,
     pub object: Option<String>,
     pub function_regex: Option<String>,
-    pub page: Option<usize>,
-    pub per_page: Option<usize>,
+    #[serde(default = "default_page")]
+    pub page: usize,
+    #[serde(default = "default_per_page")]
+    pub per_page: usize,
+}
+
+// Helper functions for default values
+fn default_page() -> usize {
+    1
+}
+fn default_per_page() -> usize {
+    100
 }
 
 // Response with log entries

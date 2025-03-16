@@ -1,5 +1,5 @@
 //! Parser for GStreamer logs
-//! 
+//!
 //! This module uses the gst-log-parser crate by Guillaume Desmottes
 //! https://github.com/gdesmott/gst-log-parser/
 
@@ -16,8 +16,8 @@ pub fn parse<R: Read>(r: R) -> impl Iterator<Item = Entry> {
 }
 
 // Extended functionality for Entry from gst-log-parser
-use std::str::FromStr;
 use gstreamer::Structure;
+use std::str::FromStr;
 
 // Add a utility method to convert message to GStreamer Structure if not provided by the crate
 // This is currently not used but kept for potential future use

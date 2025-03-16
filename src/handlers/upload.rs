@@ -43,7 +43,8 @@ pub async fn upload_log(
 
         log::debug!(
             "Processing field '{}' with type '{}'",
-            field_name, content_type
+            field_name,
+            content_type
         );
 
         // Get file data
@@ -127,7 +128,9 @@ pub fn parse_log_file(
     );
 
     if entries.is_empty() {
-        log::warn!("No entries were parsed from the log file. This might indicate an incorrect format.");
+        log::warn!(
+            "No entries were parsed from the log file. This might indicate an incorrect format."
+        );
     } else {
         // Sample the first few entries to help with debugging
         log::debug!("Sample entries (up to 3):");

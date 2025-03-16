@@ -26,14 +26,23 @@ const LogViewer = ({ sessionId, filters, pagination, onPageChange, onPerPageChan
         
         // Add optional filters
         if (filters.level) queryParams.append('level', filters.level);
-        if (filters.category) queryParams.append('category', filters.category);
+        // Handle multiple categories
+        if (filters.categories && filters.categories.length > 0) {
+          console.log('Sending categories:', filters.categories);
+          // Use simple repeated parameter format without indices
+          filters.categories.forEach(category => {
+            queryParams.append('categories', category);
+          });
+        }
         if (filters.message_regex) queryParams.append('message_regex', filters.message_regex);
         if (filters.pid) queryParams.append('pid', filters.pid);
         if (filters.thread) queryParams.append('thread', filters.thread);
         if (filters.object) queryParams.append('object', filters.object);
         if (filters.function_regex) queryParams.append('function_regex', filters.function_regex);
         
-        const response = await fetch(`/api/logs?${queryParams.toString()}`);
+        const url = `/api/logs?${queryParams.toString()}`;
+        console.log('Fetching logs with URL:', url);
+        const response = await fetch(url);
         
         if (!response.ok) {
           throw new Error('Failed to fetch logs');
