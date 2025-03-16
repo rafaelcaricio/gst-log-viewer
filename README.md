@@ -2,6 +2,8 @@
 
 A web-based viewer for GStreamer log files that allows filtering and analysis of GStreamer application pipeline logs.
 
+![GStreamer Log Viewer Screenshot](screenshot-gst-log-viewer.png)
+
 ## Features
 
 - Upload and parse GStreamer log files
@@ -20,7 +22,6 @@ A web-based viewer for GStreamer log files that allows filtering and analysis of
 
 - Rust (2021 edition)
 - Node.js and npm/yarn
-- The `gst-log-parser` crate (must be in a neighboring directory)
 
 ## Project Structure
 
@@ -31,8 +32,7 @@ A web-based viewer for GStreamer log files that allows filtering and analysis of
 
 ### Backend
 
-1. Make sure you have the `gst-log-parser` crate in a directory next to this project
-2. Build the backend:
+1. Build the backend:
 
 ```bash
 cargo build
@@ -78,7 +78,7 @@ cargo run
 
 - Backend: Rust with Axum web framework
 - Frontend: React with Tailwind CSS and shadcn/ui components
-- Parser: Uses the gst-log-parser crate for parsing GStreamer logs
+- Parser: Uses the gst-log-parser crate (integrated as a dependency) for parsing GStreamer logs
 
 ## License
 
