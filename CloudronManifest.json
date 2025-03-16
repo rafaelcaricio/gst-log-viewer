@@ -1,0 +1,20 @@
+{
+  "id": "io.gst-log-viewer",
+  "title": "GStreamer Log Viewer",
+  "author": "Rafael Caricio",
+  "description": "A web-based viewer for GStreamer log files that allows filtering and analysis of GStreamer application pipeline logs",
+  "tagline": "Web-based GStreamer log analysis tool",
+  "version": "0.1.0",
+  "upstreamVersion": "0.1.0",
+  "healthCheckPath": "/api/filter-options",
+  "httpPort": 8000,
+  "addons": {
+    "localstorage": {}
+  },
+  "manifestVersion": 2,
+  "memoryLimit": 536870912,
+  "website": "https://github.com/rafaelcaricio/gst-log-viewer",
+  "contactEmail": "contact@example.com",
+  "tags": ["logging", "debugging", "analysis", "gstreamer", "media"],
+  "minBoxVersion": "7.3.2"
+}

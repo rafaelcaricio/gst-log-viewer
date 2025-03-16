@@ -1,0 +1,28 @@
+# Git
+.git
+.gitignore
+
+# Build artifacts
+/target
+**/target
+**/dist
+**/node_modules
+
+# Rust
+**/*.rs.bk
+Cargo.lock
+
+# Logs
+**/*.log*
+
+# Temporary files
+**/.DS_Store
+**/.tmp
+**/tmp
+
+# Large files that might be in the repository
+**/*.gz
+**/*.tar
+**/*.zip
+**/*.rar
+**/*.7z

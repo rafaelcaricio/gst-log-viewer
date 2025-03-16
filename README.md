@@ -67,6 +67,46 @@ cargo run
 
 2. Open your browser and navigate to http://localhost:3000
 
+## Deployment
+
+### Cloudron Deployment
+
+This application can be deployed to [Cloudron](https://cloudron.io/), a self-hosted platform for running web applications.
+
+1. Build the Docker image:
+
+```bash
+./build-cloudron.sh
+```
+
+2. To build and push to a Docker registry:
+
+```bash
+./build-cloudron.sh yourusername/gst-log-viewer:latest
+```
+
+3. Install on Cloudron:
+   - Go to your Cloudron dashboard
+   - Click "App Store"
+   - Click "Install from Manifest"
+   - Either provide the URL to your Git repository or upload the CloudronManifest.json file
+
+#### Cloudron Files
+
+- `CloudronManifest.json`: Defines the application for Cloudron
+- `Dockerfile`: Multi-stage build file for creating the Docker image
+- `start.sh`: Script to start the application in Cloudron environment
+- `supervisord.conf`: Configuration for managing multiple processes
+- `nginx.conf`: Configuration for the Nginx web server
+
+#### Architecture
+
+The Cloudron deployment uses:
+- **Nginx**: Serves the static frontend files and proxies API requests to the backend
+- **Supervisord**: Manages both the Nginx and backend processes
+- **Rust Backend**: Runs on port 3000 (internal)
+- **Web Interface**: Accessible via port 8000 as specified in CloudronManifest.json
+
 ## Usage
 
 1. Upload a GStreamer log file using the upload interface
