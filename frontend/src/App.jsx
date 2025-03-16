@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Toaster } from './components/ui/toaster';
 import { useToast } from './components/ui/use-toast';
 import FileUpload from './components/FileUpload';
 import LogViewer from './components/LogViewer';
 import FilterPanel from './components/FilterPanel';
 import Navbar from './components/Navbar';
+import TimelineChart from './components/TimelineChart';
 
 function App() {
   const [sessionId, setSessionId] = useState(null);
@@ -19,6 +20,7 @@ function App() {
     object: null,
     function_regex: null,
   });
+  const [timeRange, setTimeRange] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
     per_page: 100,
@@ -104,6 +106,16 @@ function App() {
     setPagination({ ...pagination, page: 1 }); // Reset to first page on filter change
   };
   
+  const handleTimeRangeChange = useCallback((newTimeRange) => {
+    console.log("Time range changed:", newTimeRange);
+    
+    // Store the time range in state
+    setTimeRange(newTimeRange);
+    
+    // Reset pagination to first page
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, []);
+  
   const handlePageChange = (newPage) => {
     setPagination({ ...pagination, page: newPage });
   };
@@ -123,6 +135,7 @@ function App() {
     setSessionId(null);
     setFilterOptions(null);
     setIsLoading(false);
+    setTimeRange(null);
     setFilters({
       level: null,
       categories: [],
@@ -136,6 +149,12 @@ function App() {
       page: 1,
       per_page: 100,
     });
+  };
+  
+  // Combine all filters into a single object for LogViewer
+  const combinedFilters = {
+    ...filters,
+    timeRange,
   };
   
   return (
@@ -177,24 +196,34 @@ function App() {
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <div className="lg:col-span-1">
-                  <FilterPanel 
-                    isLoading={isLoading}
-                    filterOptions={filterOptions}
-                    filters={filters}
-                    onFilterChange={handleFilterChange}
-                  />
-                </div>
+              <div className="space-y-6">
+                {/* Timeline Chart */}
+                <TimelineChart 
+                  sessionId={sessionId} 
+                  filters={filters}
+                  onTimeRangeChange={handleTimeRangeChange}
+                />
                 
-                <div className="lg:col-span-3">
-                  <LogViewer 
-                    sessionId={sessionId}
-                    filters={filters}
-                    pagination={pagination}
-                    onPageChange={handlePageChange}
-                    onPerPageChange={handlePerPageChange}
-                  />
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                  <div className="lg:col-span-1">
+                    <FilterPanel 
+                      isLoading={isLoading}
+                      filterOptions={filterOptions}
+                      filters={filters}
+                      onFilterChange={handleFilterChange}
+                    />
+                  </div>
+                  
+                  <div className="lg:col-span-3">
+                    <LogViewer 
+                      sessionId={sessionId}
+                      filters={combinedFilters}
+                      pagination={pagination}
+                      onPageChange={handlePageChange}
+                      onPerPageChange={handlePerPageChange}
+                    />
+                  </div>
                 </div>
               </div>
             )}

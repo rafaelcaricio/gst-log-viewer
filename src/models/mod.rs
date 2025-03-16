@@ -61,6 +61,12 @@ pub struct LogFilter {
     pub page: usize,
     #[serde(default = "default_per_page")]
     pub per_page: usize,
+    // Time range filtering
+    pub min_timestamp: Option<u64>,
+    pub max_timestamp: Option<u64>,
+    // Explicit time unit flag
+    #[serde(default)]
+    pub use_microseconds: bool,
 }
 
 // Helper functions for default values

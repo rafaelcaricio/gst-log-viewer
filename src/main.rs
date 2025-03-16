@@ -12,6 +12,7 @@ use tower_http::{cors::CorsLayer, services::ServeDir};
 
 use handlers::options::get_filter_options;
 use handlers::query::get_logs;
+use handlers::timeline::get_timeline;
 use handlers::upload::upload_log;
 use models::AppState;
 
@@ -37,6 +38,7 @@ async fn main() {
     let app = Router::new()
         .route("/api/upload", post(upload_log))
         .route("/api/logs", get(get_logs))
+        .route("/api/timeline", get(get_timeline))
         .route("/api/filter-options", get(get_filter_options))
         .nest_service("/", ServeDir::new("frontend/dist"))
         .layer(CorsLayer::permissive())

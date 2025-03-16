@@ -7,7 +7,19 @@ use axum::http::StatusCode;
 use axum::response::Json;
 use regex::Regex;
 
-use crate::models::{ApiError, AppState, LogFilter, LogResponse, SerializableEntry};
+use crate::models::{ApiError, AppState, LogFilter, SerializableEntry};
+
+// Helper function to convert ClockTime to milliseconds
+fn to_milliseconds(clock_time: &gstreamer::ClockTime) -> u64 {
+    // ClockTime is in nanoseconds, convert to milliseconds
+    clock_time.nseconds() / 1_000_000
+}
+
+// Helper function to convert ClockTime to microseconds
+fn to_microseconds(clock_time: &gstreamer::ClockTime) -> u64 {
+    // ClockTime is in nanoseconds, convert to microseconds
+    clock_time.nseconds() / 1_000
+}
 
 // Handler for getting log entries with filtering and pagination
 pub async fn get_logs(
@@ -15,7 +27,7 @@ pub async fn get_logs(
     raw_query: RawQuery,
     // Use an extractor to capture deserialization errors
     query_result: Result<Query<LogFilter>, axum::extract::rejection::QueryRejection>,
-) -> Result<Json<LogResponse>, ApiError> {
+) -> Result<Json<crate::models::LogResponse>, ApiError> {
     // Log the raw query string first to see exactly what's being received
     log::info!("Raw query string: {:?}", raw_query.0);
 
@@ -71,9 +83,61 @@ pub async fn get_logs(
 
     log::debug!("Found session with {} entries", entries.len());
 
-    // Apply filters
+    // Use the explicit flag for microsecond precision
+    let use_microseconds = filter.use_microseconds;
+
+    if use_microseconds {
+        log::debug!("Using microsecond precision for timestamp filtering (explicitly specified)");
+    } else {
+        log::debug!("Using millisecond precision for timestamp filtering");
+    }
+
+    // Apply time range filters first if specified
+    let filtered_entries = if filter.min_timestamp.is_some() || filter.max_timestamp.is_some() {
+        entries
+            .iter()
+            .filter(|entry| {
+                // Get timestamp in the appropriate unit
+                let timestamp = if use_microseconds {
+                    to_microseconds(&entry.ts)
+                } else {
+                    to_milliseconds(&entry.ts)
+                };
+
+                // Log some sample timestamps for debugging
+                if filter.min_timestamp.is_some() {
+                    let min_ts = filter.min_timestamp.unwrap();
+                    log::debug!(
+                        "Comparing timestamp {} to min_timestamp {}",
+                        timestamp,
+                        min_ts
+                    );
+                }
+
+                // Check min timestamp
+                if let Some(min_ts) = filter.min_timestamp {
+                    if timestamp < min_ts {
+                        return false;
+                    }
+                }
+
+                // Check max timestamp
+                if let Some(max_ts) = filter.max_timestamp {
+                    if timestamp > max_ts {
+                        return false;
+                    }
+                }
+
+                true
+            })
+            .collect::<Vec<_>>()
+    } else {
+        entries.iter().collect::<Vec<_>>()
+    };
+
+    // Apply other filters
     let start_time = Instant::now();
-    let filtered_entries = entries
+    let filtered_entries = filtered_entries
         .iter()
         .filter(|entry| {
             // Filter by level if specified
@@ -175,6 +239,7 @@ pub async fn get_logs(
 
             true
         })
+        .map(|entry| *entry) // Dereference to get &Entry instead of &&Entry
         .collect::<Vec<_>>();
 
     let filter_time = start_time.elapsed();
@@ -209,7 +274,7 @@ pub async fn get_logs(
         .map(SerializableEntry::from)
         .collect();
 
-    Ok(Json(LogResponse {
+    Ok(Json(crate::models::LogResponse {
         entries: paginated_entries,
         total,
         page,

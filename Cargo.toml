@@ -15,7 +15,7 @@ tower-http = { version = "0.5.0", features = ["cors", "fs"] }
 tempfile = "3.8.1"
 uuid = { version = "1.6.1", features = ["v4"] }
 regex = "1.10.2"
-gstreamer = "0.21.1"
+gstreamer = "0.23.5"  # Updated to match gst-log-parser's version
 anyhow = "1.0"
 log = "0.4"
 env_logger = "0.10"

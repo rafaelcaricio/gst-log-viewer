@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, XCircle } from 'lucide-react';
 
 const LogViewer = ({ sessionId, filters, pagination, onPageChange, onPerPageChange }) => {
   const [logEntries, setLogEntries] = useState([]);
@@ -40,6 +40,16 @@ const LogViewer = ({ sessionId, filters, pagination, onPageChange, onPerPageChan
         if (filters.object) queryParams.append('object', filters.object);
         if (filters.function_regex) queryParams.append('function_regex', filters.function_regex);
         
+        // Add time range filter if present
+        if (filters.timeRange) {
+          if (filters.timeRange.min) queryParams.append('min_timestamp', filters.timeRange.min);
+          if (filters.timeRange.max) queryParams.append('max_timestamp', filters.timeRange.max);
+          // Add the time unit flag if present
+          if (filters.timeRange.useMicroseconds !== undefined) {
+            queryParams.append('use_microseconds', filters.timeRange.useMicroseconds);
+          }
+        }
+        
         const url = `/api/logs?${queryParams.toString()}`;
         console.log('Fetching logs with URL:', url);
         const response = await fetch(url);
@@ -62,6 +72,17 @@ const LogViewer = ({ sessionId, filters, pagination, onPageChange, onPerPageChan
     fetchLogs();
   }, [sessionId, filters, pagination]);
   
+  // Format time in a more readable way
+  const formatTime = (timestamp) => {
+    // Parse timestamp and format it (this assumes timestamp is in a standard format)
+    try {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3 });
+    } catch (e) {
+      return timestamp; // Return original if parsing fails
+    }
+  };
+  
   const getLevelClass = (level) => {
     const levelLower = level.toLowerCase();
     if (levelLower.includes('error')) return 'log-entry-error';
@@ -74,7 +95,18 @@ const LogViewer = ({ sessionId, filters, pagination, onPageChange, onPerPageChan
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Log Entries</CardTitle>
+        <div className="flex items-center">
+          <CardTitle>Log Entries</CardTitle>
+          {filters.timeRange && (
+            <div className="ml-4 flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-md text-sm">
+              <span>Time filtered</span>
+              <XCircle 
+                className="ml-2 h-4 w-4 cursor-pointer text-blue-600 hover:text-blue-800" 
+                onClick={() => window.location.reload()} 
+              />
+            </div>
+          )}
+        </div>
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-500">
             {totalEntries > 0 ? 
