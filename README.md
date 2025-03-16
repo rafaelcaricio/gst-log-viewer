@@ -2,12 +2,16 @@
 
 A web-based viewer for GStreamer log files that allows filtering and analysis of GStreamer application pipeline logs.
 
-![GStreamer Log Viewer Screenshot](screenshot-gst-log-viewer.png)
+![GStreamer Log Viewer Screenshot - with timeline view and filtering options](screenshot-gst-log-viewer.png)
 
 ## Features
 
 - Upload and parse GStreamer log files
-- Filter logs by:
+- Interactive timeline view that shows log entry distribution over time:
+  - Group logs by various time intervals (microseconds to minutes)
+  - Select specific time ranges to filter log entries
+  - Visualize busy periods or potential issues at a glance
+- Comprehensive filtering by:
   - Log level
   - Category
   - Message content (regex)
@@ -15,6 +19,7 @@ A web-based viewer for GStreamer log files that allows filtering and analysis of
   - Thread
   - Object
   - Function name (regex)
+  - Time range selection
 - Pagination for efficient navigation through large log files
 - Responsive UI with a modern design
 
@@ -110,9 +115,14 @@ The Cloudron deployment uses:
 ## Usage
 
 1. Upload a GStreamer log file using the upload interface
-2. Use the filters panel to narrow down the log entries
-3. View and paginate through the filtered log entries
-4. Adjust the entries per page as needed
+2. Explore the timeline chart to see log entry distribution over time:
+   - Change the time interval grouping (from microseconds to minutes) using the dropdown
+   - Click or drag on the timeline to select a specific time range
+   - Use the brush below the timeline to zoom in on specific regions
+   - Clear time range selection using the "Clear" button
+3. Use the filters panel to narrow down the log entries by level, category, etc.
+4. View and paginate through the filtered log entries
+5. Adjust the entries per page as needed
 
 ## Technical Details
 
