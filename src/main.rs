@@ -9,6 +9,7 @@ use std::sync::{Arc, RwLock};
 
 use anyhow::Result;
 use axum::routing::{get, post};
+use axum::extract::DefaultBodyLimit;
 use axum::Router;
 use tempfile::TempDir;
 use tower_http::{cors::CorsLayer, services::ServeDir};
@@ -64,6 +65,7 @@ async fn main() -> Result<()> {
         .route("/api/filter-options", get(get_filter_options))
         .nest_service("/", ServeDir::new("frontend/dist"))
         .layer(CorsLayer::permissive())
+        .layer(DefaultBodyLimit::max(500 * 1024 * 1024)) // Set max body limit to 500MB
         .with_state(state);
 
     // Run our application with hyper
